@@ -26,6 +26,8 @@
 #include <grub/i18n.h>
 #include <grub/types.h>
 #include <grub/charset.h>
+#include <grub/i386/io.h>
+#include <grub/ns8250.h>
 
 union printf_arg
 {
@@ -230,6 +232,40 @@ grub_debug_enabled (const char * condition)
   return ret;
 }
 
+static void
+serial_print_char(char c, unsigned short int port)
+{
+  int i = 0;
+  while (i < 100 && !(grub_inb(port + UART_LSR) & UART_EMPTY_TRANSMITTER))
+    ++i;
+
+  if (i < 100)
+    grub_outb(c, port);
+}
+
+static void
+serial_print(const char *str, unsigned short int port)
+{
+  while (*str) {
+    if (*str == '\n')
+      serial_print_char('\r', port);
+    serial_print_char(*str++, port);
+  }
+}
+
+void
+grub_serial_print_nofree(const char *str)
+{
+    serial_print(str, 0x3f8);
+}
+
+void
+grub_serial_print(char *str)
+{
+    grub_serial_print_nofree(str);
+    grub_free(str);
+}
+
 void
 grub_real_dprintf (const char *file, const int line, const char *condition,
 		   const char *fmt, ...)
@@ -243,6 +279,13 @@ grub_real_dprintf (const char *file, const int line, const char *condition,
       grub_vprintf (fmt, args);
       va_end (args);
       grub_refresh ();
+    }
+    else if (!grub_strncmp (condition, "slaunch", 7))
+    {
+      va_start (args, fmt);
+      grub_serial_print_nofree ("slaunch: ");
+      grub_serial_print (grub_xvasprintf (fmt, args));
+      va_end (args);
     }
 }
 

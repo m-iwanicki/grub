@@ -44,6 +44,20 @@ grub_error (grub_err_t n, const char *fmt, ...)
   grub_vsnprintf (grub_errmsg, sizeof (grub_errmsg), _(fmt), ap);
   va_end (ap);
 
+  switch (n) {
+    case GRUB_ERR_TEST_FAILURE:
+    case GRUB_ERR_UNKNOWN_DEVICE:
+    case GRUB_ERR_UNKNOWN_FS:
+    case GRUB_ERR_BAD_PART_TABLE:
+    case GRUB_ERR_BAD_FS:
+      /* ignore */
+      break;
+    default:
+      grub_serial_print_nofree (grub_errmsg);
+      grub_serial_print_nofree ("\n");
+      break;
+  }
+
   return n;
 }
 
