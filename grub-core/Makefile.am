@@ -466,6 +466,9 @@ syminfo.lst: gensyminfo.sh kernel_syms.lst $(top_srcdir)/grub-core/extra_deps.ls
 	  sh $< $$m >> $@.new || exit 1; \
 	done
 	mv $@.new $@
+	sed -i '/undefined slaunch grub_efi_system_table/d' $@
+	sed -i '/undefined slaunch grub_efi_free_pages/d' $@
+	sed -i '/undefined slaunch grub_efi_allocate_pages_real/d' $@
 
 # generate global module dependencies list
 moddep.lst: syminfo.lst genmoddep.awk video.lst
