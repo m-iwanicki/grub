@@ -363,6 +363,24 @@ grub_drtm_get_capability (void)
   drtm_capability.tmr_alignment = reg_val & 0x00FFFFFF;
   drtm_capability.tmr_count = (reg_val & 0xFF000000) >> 24;
 
+  grub_dprintf ("slaunch", "\n    "
+                "capability:\n\t"
+                "status:         0x%x\n\t"
+                "drtm_enabled:   %d\n\t"
+                "tsme_enabled:   %d\n\t"
+                "anti_rollback:  %d\n\t"
+                "version:        0x%x\n\t"
+                "tmr_alignment:  0x%x\n\t"
+                "tmr_count:      %d\n",
+                status,
+                drtm_capability.drtm_enabled,
+                drtm_capability.tsme_enabled,
+                drtm_capability.anti_rollback_status_bit,
+                drtm_capability.version,
+                drtm_capability.tmr_alignment,
+                drtm_capability.tmr_count
+                );
+
   return GRUB_ERR_NONE;
 }
 
